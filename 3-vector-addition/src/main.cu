@@ -54,7 +54,6 @@ int main() {
     // copy data from host to device
     cudaMemcpy(d_a, h_a, size, cudaMemcpyHostToDevice);
     cudaMemcpy(d_b, h_b, size, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_result, h_result, size, cudaMemcpyHostToDevice);
 
     uint constexpr blockDim {32}; // warp size is 32, so use the same for the block
     uint constexpr gridDim {N/blockDim};
