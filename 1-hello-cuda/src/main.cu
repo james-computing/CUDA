@@ -5,7 +5,7 @@
 int main() {
     std::cout << "Launch kernel" << std::endl;
 
-    f<<<1,1>>>();
+    kernel<<<1,1>>>();
 
     // Wait for GPU to finish, so it uses the printf inside f.
     cudaDeviceSynchronize();

@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-__global__ void f(void) {
+__global__ void kernel(void) {
 
     if (threadIdx.x == 0 && threadIdx.y == 0 && threadIdx.z == 0) {
         if (blockIdx.x == 0 && blockIdx.y == 0 && blockIdx.z == 0) {
