@@ -63,7 +63,6 @@ int main() {
     
     // copy result from device to host
     cudaMemcpy(h_result, d_result, size, cudaMemcpyDeviceToHost);
-    cudaDeviceSynchronize();
 
     // Print the result and test correctness
     bool correct {true};
