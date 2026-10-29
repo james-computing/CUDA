@@ -6,6 +6,7 @@ __global__ void f(void) {
         if (blockIdx.x == 0 && blockIdx.y == 0 && blockIdx.z == 0) {
             printf("Kernel executed\n");
             printf("Grid dims = (%d, %d, %d)\n", gridDim.x, gridDim.y, gridDim.z);
+            printf("Block dims = (%d, %d, %d)\n", blockDim.x, blockDim.y, blockDim.z);
         }
 
         printf("Block = (%d, %d, %d)\n", blockIdx.x, blockIdx.y, blockIdx.z);
