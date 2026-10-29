@@ -14,12 +14,7 @@ set(CMAKE_CUDA_ARCHITECTURES "75") # 75 = Turing
 
 add_executable(app)
 
-# source files
-target_sources(app
-    PRIVATE
-        src/main.cu
-        src/kernel.cu
-)
+add_subdirectory(src)
 
 # header files
 target_include_directories(app
