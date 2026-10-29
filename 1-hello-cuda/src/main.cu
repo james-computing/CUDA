@@ -3,7 +3,7 @@
 #include "../include/kernel.cuh"
 
 int main() {
-    std::cout << "Lauch kernel" << std::endl;
+    std::cout << "Launch kernel" << std::endl;
 
     f<<<1,1>>>();
 
