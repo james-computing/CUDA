@@ -1,0 +1,17 @@
+#include <iostream>
+
+#include "../include/kernel.cuh"
+
+int main() {
+    std::cout << "Launch kernel" << std::endl;
+
+    dim3 constexpr gridDims {2,3,5}; // number of blocks for each dimension of the grid
+    dim3 constexpr blockDims {2,2,2}; // number of threads for each dimension of a block
+
+    f<<<gridDims, blockDims>>>();
+
+    // Wait for GPU to finish, so it uses the printf inside f.
+    cudaDeviceSynchronize();
+
+    return 0;
+}
