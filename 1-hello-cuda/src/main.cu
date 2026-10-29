@@ -7,7 +7,7 @@ int main() {
 
     kernel<<<1,1>>>();
 
-    // Wait for GPU to finish, so it uses the printf inside f.
+    // Wait for GPU to finish, so it uses the printf inside the kernel.
     cudaDeviceSynchronize();
 
     return 0;
