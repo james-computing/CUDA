@@ -1,3 +1,3 @@
 #pragma once
 
-__global__ void add(int * a, int * b, int * result);
+__global__ void add(int * const a, int * const b, int * const result);
