@@ -78,8 +78,12 @@ int main() {
     }
 
     // copy data from host to device
-    cudaMemcpy(d_a, h_a, size_a, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_b, h_b, size_b, cudaMemcpyHostToDevice);
+    error = cudaMemcpy(d_a, h_a, size_a, cudaMemcpyHostToDevice);
+    if (error != cudaSuccess)
+        throw std::runtime_error("Failed to copy A from host to device");
+    error = cudaMemcpy(d_b, h_b, size_b, cudaMemcpyHostToDevice);
+    if (error != cudaSuccess)
+        throw std::runtime_error("Failed to copy A from host to device");
 
     uint constexpr N {m*p};
     std::cout << "N = " << N << std::endl;
@@ -94,7 +98,9 @@ int main() {
     cudaDeviceSynchronize();
     
     // copy result from device to host
-    cudaMemcpy(h_result, d_result, size_result, cudaMemcpyDeviceToHost);
+    error = cudaMemcpy(h_result, d_result, size_result, cudaMemcpyDeviceToHost);
+    if (error != cudaSuccess)
+        throw std::runtime_error("Failed to copy C from device to host");
 
     // Print the result and test correctness
     bool correct {true};
