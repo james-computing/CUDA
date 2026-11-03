@@ -59,7 +59,6 @@ int main() {
     uint constexpr gridDim {N/blockDim};
 
     add<<<gridDim, blockDim>>>(d_a, d_b, d_result);
-    cudaDeviceSynchronize();
     
     // copy result from device to host
     cudaMemcpy(h_result, d_result, size, cudaMemcpyDeviceToHost);

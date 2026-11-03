@@ -95,7 +95,6 @@ int main() {
 
     std::cout << "Launch kernel\n" << std::endl;
     multiply<<<gridDim, blockDim>>>(m, n, p, d_a, d_b, d_result);
-    cudaDeviceSynchronize();
     
     // copy result from device to host
     error = cudaMemcpy(h_result, d_result, size_result, cudaMemcpyDeviceToHost);
