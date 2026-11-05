@@ -4,9 +4,9 @@
 
 // Each kernel computer alpha*A*B + beta*C
 
-// A MxP
-// B PxN
-// C MxN
+// A mxk
+// B kxn
+// C mxn
 
 // Index of a 1D array that corresponds to row i and column j, for a column major matrix.
 __device__ uint lexicographicIndex(uint const numCols, uint const i, uint const j) {

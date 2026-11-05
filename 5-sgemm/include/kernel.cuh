@@ -1,6 +1,6 @@
 #pragma once
 
-// Each kernel computer alpha*A*B + beta*C
+// Each kernel compute alpha*A*B + beta*C
 
 uint constexpr numKernels {1};
 
