@@ -1,1 +1,1 @@
-sudo $(which ncu) -o profile ./build/app
+sudo $(which ncu) --set full -o profile -f ./build/app
