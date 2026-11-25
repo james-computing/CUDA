@@ -9,6 +9,7 @@
 // B kxn
 // C mxn
 
+// Compiler used by Kernel Tuner doesn't recognize the type uint
 typedef unsigned int uint;
 
 template <uint BX_KERNEL7, uint BY_KERNEL7, uint c1, uint c2, uint l>
