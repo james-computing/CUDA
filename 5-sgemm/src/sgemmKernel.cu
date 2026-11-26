@@ -47,11 +47,6 @@ void sgemmKernel(
 
     uint constexpr BLOCKSIZE {32};
 
-    uint constexpr BX_KERNEL7 {4};
-    uint constexpr BY_KERNEL7 {4};
-    uint constexpr c1 {4};
-    uint constexpr c2 {4};
-
     switch(kernelNumber) {
         case 1:
             gridDim = {CEIL_DIV(m, BLOCKSIZE), CEIL_DIV(n, BLOCKSIZE), 1};
@@ -101,7 +96,6 @@ void sgemmKernel(
     cudaEventCreate(&end);
 
     // Warm up before measuring time
-    uint constexpr l {BX_KERNEL7};
     switch(kernelNumber) {
         case 1:
             kernel1<<<gridDim,blockDim>>>(m, n, k, alpha, d_A, d_B, beta, d_C);
@@ -122,7 +116,7 @@ void sgemmKernel(
             kernel6<<<gridDim,blockDim>>>(m, n, k, alpha, d_A, d_B, beta, d_C);
             break;
         case 7:
-            kernel7<BX_KERNEL7, BY_KERNEL7, c1, c2, l><<<gridDim,blockDim>>>(m, n, k, alpha, d_A, d_B, beta, d_C);
+            kernel7<<<gridDim,blockDim>>>(m, n, k, alpha, d_A, d_B, beta, d_C);
             break;
         default:
             throw std::runtime_error("Unknown kernel");

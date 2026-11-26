@@ -13,7 +13,7 @@ target_sources(app
         kernel4.cu
         kernel5.cu
         kernel6.cu
-        #kernel7.cu # using templates requires using header only
+        kernel7.cu
         lexicographicIndex.cu
         print.cu
         sgemmCublas.cu
