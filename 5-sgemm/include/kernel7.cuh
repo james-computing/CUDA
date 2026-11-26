@@ -13,10 +13,10 @@
 #ifndef kernel_tuner
 
 uint constexpr BX_KERNEL7 {4};
-uint constexpr BY_KERNEL7 {4};
-uint constexpr c1 {4};
-uint constexpr c2 {4};
-uint constexpr l {BX_KERNEL7};
+uint constexpr BY_KERNEL7 {8};
+uint constexpr c1 {8};
+uint constexpr c2 {1};
+uint constexpr l {8};
 
 #else
 

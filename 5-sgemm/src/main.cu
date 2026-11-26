@@ -104,11 +104,15 @@ void run(uint const m, uint const n, uint const k) {
 int main() {
     // For better cache locality, take m, n and k to be multiples of 32
     
-    
+    /*
     uint constexpr m {1 << 11};
     uint constexpr n {1 << 11};
     uint constexpr k {1 << 11};
-    
+    */
+
+    uint constexpr m {1 << 10};
+    uint constexpr n {1 << 10};
+    uint constexpr k {1 << 10};
 
     /*
     uint constexpr m {1 << 9};

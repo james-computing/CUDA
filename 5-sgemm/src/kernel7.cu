@@ -2,6 +2,10 @@
 #include "../include/lexicographicIndex.cuh"
 #include "../include/ceildiv.hpp"
 
+#ifdef kernel_tuner
+#include "../src/lexicographicIndex.cu"
+#endif
+
 // Each kernel computer alpha*A*B + beta*C
 
 // A mxk
