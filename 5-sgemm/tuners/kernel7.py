@@ -5,7 +5,7 @@ import os
 #import logging
 #logging.basicConfig(level=logging.DEBUG)
 
-m = 2**11
+m = 2**10
 n = m
 k = m
 
@@ -25,19 +25,19 @@ tune_params = dict()
 # Must use parameters names that are different from the ones used in the kernel.
 # This is because Kernel Tuner will insert macros with the parameter names.
 
-# BX=4, BY=8, TX=8, TY=1, L=8, time=78.666ms
+# BX=8, BY=8, TX=1, TY=1, L=8, time=5.751ms
 
-tune_params["BX"] = [2, 4, 8, 16, 32]
-tune_params["BY"] = [2, 4, 8, 16, 32]
-tune_params["TX"] = [1, 2, 4, 8, 16, 32]
-tune_params["TY"] = [1, 2, 4, 8, 16, 32]
-tune_params["L"] = [4, 8, 16, 32, 64, 128, 256]
+tune_params["BX"] = [4, 8, 16]
+tune_params["BY"] = [4, 8, 16]
+tune_params["TX"] = [1, 2, 4, 8]
+tune_params["TY"] = [1, 2, 4, 8]
+tune_params["L"] = [4, 8, 16]
 
 def params_are_valid(BX, BY, TX, TY, L):
     b1 = (TX > 0)
-    b2 = (TX % 4 == 0)
+    b2 = True #(TX % 4 == 0)
     b3 = (TY > 0)
-    b4 = (TY % 4 == 0)
+    b4 = True #(TY % 4 == 0)
     b5 = (L > 0)
     b6 = (L % BX == 0)
     b7 = (L % BY == 0)

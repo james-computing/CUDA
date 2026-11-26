@@ -7,6 +7,7 @@
 #include "../include/kernel5.cuh"
 #include "../include/kernel6.cuh"
 #include "../include/kernel7.cuh"
+#include "../include/kernel8.cuh"
 
 #include "../include/ceildiv.hpp"
 
@@ -78,6 +79,12 @@ void sgemmKernel(
             gridDim = {CEIL_DIV(m, BX_KERNEL7 * TX_KERNEL7), CEIL_DIV(n, BY_KERNEL7 * TY_KERNEL7), 1};
             blockDim = {BX_KERNEL7, BY_KERNEL7, 1};
             break;
+        case 8:
+            // A thread computes a TX_KERNEL8 x TY_KERNEL8 block of C.
+            // A thread block computes a BX*TX_KERNEL8 x BY*TY_KERNEL8 block of C.
+            gridDim = {CEIL_DIV(m, BX_KERNEL8 * TX_KERNEL8), CEIL_DIV(n, BY_KERNEL8 * TY_KERNEL8), 1};
+            blockDim = {BX_KERNEL8, BY_KERNEL8, 1};
+            break;
         default:
             throw std::runtime_error("No definition of gridDim for kernel");
     }
@@ -117,6 +124,9 @@ void sgemmKernel(
             break;
         case 7:
             kernel7<<<gridDim,blockDim>>>(m, n, k, alpha, d_A, d_B, beta, d_C);
+            break;
+        case 8:
+            kernel8<<<gridDim,blockDim>>>(m, n, k, alpha, d_A, d_B, beta, d_C);
             break;
         default:
             throw std::runtime_error("Unknown kernel");
@@ -172,6 +182,9 @@ void sgemmKernel(
                 break;
             case 7:
                 kernel7<<<gridDim,blockDim>>>(m, n, k, alpha, d_A, d_B, beta, d_C);
+                break;
+            case 8:
+                kernel8<<<gridDim,blockDim>>>(m, n, k, alpha, d_A, d_B, beta, d_C);
                 break;
             default:
                 throw std::runtime_error("Unknown kernel");

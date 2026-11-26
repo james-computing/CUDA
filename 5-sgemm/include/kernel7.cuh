@@ -12,9 +12,9 @@
 
 #ifndef kernel_tuner
 
-uint constexpr BX_KERNEL7 {4};
+uint constexpr BX_KERNEL7 {8};
 uint constexpr BY_KERNEL7 {8};
-uint constexpr TX_KERNEL7 {8};
+uint constexpr TX_KERNEL7 {1};
 uint constexpr TY_KERNEL7 {1};
 uint constexpr L_KERNEL7 {8};
 

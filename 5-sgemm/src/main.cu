@@ -1,12 +1,11 @@
 #include <iostream>
+#include <vector>
 
 #include "../include/initMatrices.cuh"
 #include "../include/sgemmCublas.cuh"
 #include "../include/sgemmKernel.cuh"
 
-uint constexpr numKernels {7};
-
-void run(uint const m, uint const n, uint const k) {
+void run(uint const m, uint const n, uint const k, std::vector<uint> kernelNumbers) {
     float constexpr alpha {1};
     float constexpr beta {0};
 
@@ -65,7 +64,7 @@ void run(uint const m, uint const n, uint const k) {
 
     float const cublasElapsedTime {sgemmCublas(m, n, k, alpha, d_A, d_B, beta, d_C_initial, d_C, h_C_reference)};
 
-    for (uint kernelNumber {1}; kernelNumber <= numKernels; ++kernelNumber) {
+    for (uint const kernelNumber : kernelNumbers) {
         sgemmKernel(
             m,
             n,
@@ -103,16 +102,17 @@ void run(uint const m, uint const n, uint const k) {
 
 int main() {
     // For better cache locality, take m, n and k to be multiples of 32
-    
     /*
     uint constexpr m {1 << 11};
     uint constexpr n {1 << 11};
     uint constexpr k {1 << 11};
     */
 
+    
     uint constexpr m {1 << 10};
     uint constexpr n {1 << 10};
     uint constexpr k {1 << 10};
+    
 
     /*
     uint constexpr m {1 << 9};
@@ -153,7 +153,10 @@ int main() {
     std::cout << "(m, n, k) = (" << m << ", " << n << ", " << k << ")\n";
     std::cout << "m * n = " << m * n << std::endl;
 
-    run(m, n, k);
+    // 5  is too bad
+    std::vector<uint> kernelNumbers {1, 2, 3, 4, 6, 7, 8};
+
+    run(m, n, k, kernelNumbers);
 
     return 0;
 }

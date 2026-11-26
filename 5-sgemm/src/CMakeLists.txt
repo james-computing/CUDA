@@ -14,6 +14,7 @@ target_sources(app
         kernel5.cu
         kernel6.cu
         kernel7.cu
+        kernel8.cu
         lexicographicIndex.cu
         print.cu
         sgemmCublas.cu

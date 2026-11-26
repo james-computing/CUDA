@@ -16,13 +16,14 @@ __device__ void kernel7StaticAsserts() {
     // Each thread will compute a block of C of size TX_KERNEL7 x TY_KERNEL7.
     // I'll work with multiples of 4, to simplify using float4 later.
     static_assert(TX_KERNEL7 > 0);
-    static_assert(TX_KERNEL7 % 4 == 0);
+    //static_assert(TX_KERNEL7 % 4 == 0);
 
     // I want to pick a square block (TY_KERNEL7 = TX_KERNEL7) or a column (TY_KERNEL7 = 1).
     // A column may be better for cache locality.
     // I at least expect TY_KERNEL7 to divide TX_KERNEL7.
     // I see no good reason to take TY_KERNEL7 > TX_KERNEL7, because it may be worse for cache locality.
     static_assert(TY_KERNEL7 > 0);
+    //static_assert(TX_KERNEL8 % 4 == 0);
     //static_assert(TX_KERNEL7 % TY_KERNEL7 == 0); // TY_KERNEL7 | TX_KERNEL7
 
     // Width of the block of A to be loaded in shared memory, in multiples of TX_KERNEL7.
