@@ -13,26 +13,26 @@
 // C mxn
 
 __device__ void kernel7StaticAsserts() {
-    // Each thread will compute a block of C of size c1 x c2.
+    // Each thread will compute a block of C of size TX_KERNEL7 x TY_KERNEL7.
     // I'll work with multiples of 4, to simplify using float4 later.
-    static_assert(c1 > 0);
-    static_assert(c1 % 4 == 0);
+    static_assert(TX_KERNEL7 > 0);
+    static_assert(TX_KERNEL7 % 4 == 0);
 
-    // I want to pick a square block (c2 = c1) or a column (c2 = 1).
+    // I want to pick a square block (TY_KERNEL7 = TX_KERNEL7) or a column (TY_KERNEL7 = 1).
     // A column may be better for cache locality.
-    // I at least expect c2 to divide c1.
-    // I see no good reason to take c2 > c1, because it may be worse for cache locality.
-    static_assert(c2 > 0);
-    //static_assert(c1 % c2 == 0); // c2 | c1
+    // I at least expect TY_KERNEL7 to divide TX_KERNEL7.
+    // I see no good reason to take TY_KERNEL7 > TX_KERNEL7, because it may be worse for cache locality.
+    static_assert(TY_KERNEL7 > 0);
+    //static_assert(TX_KERNEL7 % TY_KERNEL7 == 0); // TY_KERNEL7 | TX_KERNEL7
 
-    // Width of the block of A to be loaded in shared memory, in multiples of c1.
-    // That is, the actual width is l * c1.
+    // Width of the block of A to be loaded in shared memory, in multiples of TX_KERNEL7.
+    // That is, the actual width is L_KERNEL7 * TX_KERNEL7.
     // It is also the height for the block of B to be loaded in shared memory.
-    static_assert(l > 0);
-    // I want l to be a multiple of BX_KERNEL7 and BY_KERNEL7,
+    static_assert(L_KERNEL7 > 0);
+    // I want L_KERNEL7 to be a multiple of BX_KERNEL7 and BY_KERNEL7,
     // so we can divide nicely the data that will be loaded in shared memory.
-    static_assert(l % BX_KERNEL7 == 0); // BX_KERNEL7 | l
-    static_assert(l % BY_KERNEL7 == 0); // BY_KERNEL7 | l
+    static_assert(L_KERNEL7 % BX_KERNEL7 == 0); // BX_KERNEL7 | L_KERNEL7
+    static_assert(L_KERNEL7 % BY_KERNEL7 == 0); // BY_KERNEL7 | L_KERNEL7
 }
 
 __global__ void kernel7(
@@ -49,20 +49,20 @@ __global__ void kernel7(
 
     // Data for shared shared array allocation
     uint constexpr maxFloatsInSharedMemory  {8192}; // 8192 = 2 * 64 * 64
-    uint constexpr sizeBlockOfA             {BX_KERNEL7 * c1 * l}; // number of floats in the block
-    uint constexpr sizeBlockOfB             {BY_KERNEL7 * c2 * l};
+    uint constexpr sizeBlockOfA             {BX_KERNEL7 * TX_KERNEL7 * L_KERNEL7}; // number of floats in the block
+    uint constexpr sizeBlockOfB             {BY_KERNEL7 * TY_KERNEL7 * L_KERNEL7};
     uint constexpr blockPairSize            {sizeBlockOfA + sizeBlockOfB}; // total number of floats to load in shared memory
 
-    // Divide the matrix C into blocks of size c1 x c2.
+    // Divide the matrix C into blocks of size TX_KERNEL7 x TY_KERNEL7.
     // (I,J) is the row and column of one of these blocks, seeing C as a block matrix.
     // This thread will compute this block of C.
     uint const I {BX_KERNEL7 * blockIdx.x + threadIdx.x};
     uint const J {BY_KERNEL7 * blockIdx.y + threadIdx.y};
 
-    // M is the height of C as a block matrix. Each block is c1 x c2 (except maybe the last blocks).
-    //uint const M {CEIL_DIV(m, c1)};
+    // M is the height of C as a block matrix. Each block is TX_KERNEL7 x TY_KERNEL7 (except maybe the last blocks).
+    //uint const M {CEIL_DIV(m, TX_KERNEL7)};
     // N is the width of C as a block matrix.
-    //uint const N {CEIL_DIV(n, c2)};
+    //uint const N {CEIL_DIV(n, TY_KERNEL7)};
 
     // The shared array will store a block pair (a block of A and a block of B).
     uint constexpr sharedArraySize {blockPairSize};
@@ -79,12 +79,12 @@ __global__ void kernel7(
     // checking for I and J is redundant.
 
     // The thread will compute the multiplication of a block of A and a block of B,
-    // resulting in a c1 x c2 block.
-    float AB_block[c1][c2];
+    // resulting in a TX_KERNEL7 x TY_KERNEL7 block.
+    float AB_block[TX_KERNEL7][TY_KERNEL7];
 
     // Initialize it with zeros
-    for (uint dj {0}; dj < c2; ++dj) {
-        for (uint di {0}; di < c1; ++di) {
+    for (uint dj {0}; dj < TY_KERNEL7; ++dj) {
+        for (uint di {0}; di < TX_KERNEL7; ++di) {
             AB_block[di][dj] = 0;
         }
     }
@@ -95,11 +95,11 @@ __global__ void kernel7(
     // We need multiple blocks pairs, because shared memory may not have enough space.
     // numBlockPairs is the number of blocks pairs we need to load in total.
     // The blocks move in the k dimension of the each matrix, A and B.
-    // Since the length of the loaded block in the k dimension is l,
+    // Since the length of the loaded block in the k dimension is L_KERNEL7,
     // the number of block pairs is:
-    uint const numBlockPairs {CEIL_DIV(k, l)};
-    uint vectorSize {l}; // l or k % l;
-    uint const trimmedVectorSize {k % l};
+    uint const numBlockPairs {CEIL_DIV(k, L_KERNEL7)};
+    uint vectorSize {L_KERNEL7}; // L_KERNEL7 or k % L_KERNEL7;
+    uint const trimmedVectorSize {k % L_KERNEL7};
     bool const trimVector {trimmedVectorSize != 0};
     uint const lastBlockPair {numBlockPairs - 1};
     
@@ -111,23 +111,23 @@ __global__ void kernel7(
         // For good cache locality, we should load the matrices by columns.
         // Since we need rows of A and columns of B, there is a difference in their loading patterns.
 
-        // Each thread loads a c1 x l/BY_KERNEL7 block of A
-        uint const iStartA {I * c1};
-        uint const jStartA {blockPair * l + threadIdx.y * (l/BY_KERNEL7)};
+        // Each thread loads a TX_KERNEL7 x L_KERNEL7/BY_KERNEL7 block of A
+        uint const iStartA {I * TX_KERNEL7};
+        uint const jStartA {blockPair * L_KERNEL7 + threadIdx.y * (L_KERNEL7/BY_KERNEL7)};
 
         uint jLoadA {jStartA};
-        uint jLoadRelativeA {threadIdx.y * (l/BY_KERNEL7)}; // index relative to the block of A loaded by the thread block
-        for (uint dj {0}; dj < l/BY_KERNEL7; ++dj) {
+        uint jLoadRelativeA {threadIdx.y * (L_KERNEL7/BY_KERNEL7)}; // index relative to the block of A loaded by the thread block
+        for (uint dj {0}; dj < L_KERNEL7/BY_KERNEL7; ++dj) {
             if (jLoadA >= k) {
                 break;
             }
             uint iLoadA {iStartA};
-            uint iLoadRelativeA {threadIdx.x * c1}; // index relative to the block of A loaded by the thread block
-            for (uint di {0}; di < c1; ++di) {
+            uint iLoadRelativeA {threadIdx.x * TX_KERNEL7}; // index relative to the block of A loaded by the thread block
+            for (uint di {0}; di < TX_KERNEL7; ++di) {
                 if (iLoadA >= m) {
                     break;
                 }
-                uint const indexStoreA = lexicographicIndex(l, jLoadRelativeA, iLoadRelativeA);
+                uint const indexStoreA = lexicographicIndex(L_KERNEL7, jLoadRelativeA, iLoadRelativeA);
                 sharedArray[indexStoreA] = A[lexicographicIndex(m, iLoadA, jLoadA)];
                 ++iLoadA;
                 ++iLoadRelativeA;
@@ -136,24 +136,24 @@ __global__ void kernel7(
             ++jLoadRelativeA;
         }
 
-        // Each thread loads a l/BX_KERNEL7 x c2 block of B
+        // Each thread loads a L_KERNEL7/BX_KERNEL7 x TY_KERNEL7 block of B
 
-        uint const iStartB {blockPair * l + threadIdx.x * (l/BX_KERNEL7)};
-        uint const jStartB {J * c2};
+        uint const iStartB {blockPair * L_KERNEL7 + threadIdx.x * (L_KERNEL7/BX_KERNEL7)};
+        uint const jStartB {J * TY_KERNEL7};
         
         uint jLoadB {jStartB};
-        uint jLoadRelativeB {threadIdx.y * c2};
-        for (uint dj {0}; dj < c2; ++dj) {
+        uint jLoadRelativeB {threadIdx.y * TY_KERNEL7};
+        for (uint dj {0}; dj < TY_KERNEL7; ++dj) {
             if (jLoadB >= n) {
                 break;
             }
             uint iLoadB {iStartB};
-            uint iLoadRelativeB {threadIdx.x * (l/BX_KERNEL7)};
-            for (uint di {0}; di < l/BX_KERNEL7; ++di) {
+            uint iLoadRelativeB {threadIdx.x * (L_KERNEL7/BX_KERNEL7)};
+            for (uint di {0}; di < L_KERNEL7/BX_KERNEL7; ++di) {
                 if (iLoadB >= k) {
                     break;
                 }
-                uint const indexStoreB {sizeBlockOfA + lexicographicIndex(l, iLoadRelativeB, jLoadRelativeB)};
+                uint const indexStoreB {sizeBlockOfA + lexicographicIndex(L_KERNEL7, iLoadRelativeB, jLoadRelativeB)};
                 sharedArray[indexStoreB] = B[lexicographicIndex(k, iLoadB, jLoadB)];
                 ++iLoadB;
                 ++iLoadRelativeB;
@@ -170,19 +170,19 @@ __global__ void kernel7(
             vectorSize = trimmedVectorSize;
         }
 
-        for (uint dj {0}; dj < c2; ++dj) {
-            uint const j {J * c2 + dj};
+        for (uint dj {0}; dj < TY_KERNEL7; ++dj) {
+            uint const j {J * TY_KERNEL7 + dj};
             if (j >= n) {
                 break;
             }
-            for (uint di {0}; di < c1; ++di) {
-                uint const i {I * c1 + di};
+            for (uint di {0}; di < TX_KERNEL7; ++di) {
+                uint const i {I * TX_KERNEL7 + di};
                 if (i >= m) {
                     break;
                 }
                 for (uint p {0}; p < vectorSize; ++p) {
-                    uint const indexLoadA {lexicographicIndex(l, p, threadIdx.x * c1 + di)};
-                    uint const indexLoadB {sizeBlockOfA + lexicographicIndex(l, p, threadIdx.y * c2 + dj)};
+                    uint const indexLoadA {lexicographicIndex(L_KERNEL7, p, threadIdx.x * TX_KERNEL7 + di)};
+                    uint const indexLoadB {sizeBlockOfA + lexicographicIndex(L_KERNEL7, p, threadIdx.y * TY_KERNEL7 + dj)};
                     float const a {sharedArray[indexLoadA]};
                     float const b {sharedArray[indexLoadB]};
                     AB_block[di][dj] += a * b;
@@ -194,13 +194,13 @@ __global__ void kernel7(
     }
     
     // Compute the block of C
-    for (uint dj {0}; dj < c2; ++dj) {
-        uint const j {J * c2 + dj};
+    for (uint dj {0}; dj < TY_KERNEL7; ++dj) {
+        uint const j {J * TY_KERNEL7 + dj};
         if (j >= n) {
             break;
         }
-        for (uint di {0}; di < c1; ++di) {
-            uint const i {I * c1 + di};
+        for (uint di {0}; di < TX_KERNEL7; ++di) {
+            uint const i {I * TX_KERNEL7 + di};
             if (i >= m) {
                 break;
             }

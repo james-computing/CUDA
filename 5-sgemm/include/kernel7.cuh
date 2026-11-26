@@ -14,17 +14,17 @@
 
 uint constexpr BX_KERNEL7 {4};
 uint constexpr BY_KERNEL7 {8};
-uint constexpr c1 {8};
-uint constexpr c2 {1};
-uint constexpr l {8};
+uint constexpr TX_KERNEL7 {8};
+uint constexpr TY_KERNEL7 {1};
+uint constexpr L_KERNEL7 {8};
 
 #else
 
 uint constexpr BX_KERNEL7 {BX};
 uint constexpr BY_KERNEL7 {BY};
-uint constexpr c1 {C1};
-uint constexpr c2 {C2};
-uint constexpr l {L};
+uint constexpr TX_KERNEL7 {TX};
+uint constexpr TY_KERNEL7 {TY};
+uint constexpr L_KERNEL7 {L};
 
 #endif
 

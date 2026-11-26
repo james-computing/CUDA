@@ -73,9 +73,9 @@ void sgemmKernel(
             blockDim = {BLOCKSIZE_KERNEL6, BLOCKSIZE_KERNEL6, 1};
             break;
         case 7:
-            // A thread computes a c1 x c2 block of C.
-            // A thread block computes a BX*c1 x BY*c2 block of C.
-            gridDim = {CEIL_DIV(m, BX_KERNEL7 * c1), CEIL_DIV(n, BY_KERNEL7 * c2), 1};
+            // A thread computes a TX_KERNEL7 x TY_KERNEL7 block of C.
+            // A thread block computes a BX*TX_KERNEL7 x BY*TY_KERNEL7 block of C.
+            gridDim = {CEIL_DIV(m, BX_KERNEL7 * TX_KERNEL7), CEIL_DIV(n, BY_KERNEL7 * TY_KERNEL7), 1};
             blockDim = {BX_KERNEL7, BY_KERNEL7, 1};
             break;
         default:
