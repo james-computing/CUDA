@@ -37,14 +37,14 @@ def params_are_valid(BX, BY, TX, TY, L):
     b1 = (TX > 0)
     b2 = (TX % 4 == 0)
     b3 = (TY > 0)
-    b2 = (TY % 4 == 0)
-    b4 = (L > 0)
-    b5 = (L % BX == 0)
-    b6 = (L % BY == 0)
+    b4 = (TY % 4 == 0)
+    b5 = (L > 0)
+    b6 = (L % BX == 0)
+    b7 = (L % BY == 0)
     sharedArraySize = BX * TX * L + BY * TY * L
     maxFloatsInSharedMemory = 8192
-    b7 = (sharedArraySize < maxFloatsInSharedMemory)
-    return b1 and b2 and b3 and b4 and b5 and b6 and b7
+    b8 = (sharedArraySize < maxFloatsInSharedMemory)
+    return b1 and b2 and b3 and b4 and b5 and b6 and b7 and b8
 
 kernel_src = "../src/kernel7.cu"
 src_dir = os.path.dirname(os.path.abspath(kernel_src))
