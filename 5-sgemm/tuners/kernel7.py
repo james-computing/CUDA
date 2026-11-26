@@ -60,7 +60,7 @@ results, env = kernel_tuner.tune_kernel(
     grid_div_y = ["BY", "C2"],
     compiler = "nvcc",
     lang = "pycuda",
-    compiler_options=[
+    compiler_options = [
         "-std=c++23",
         "-DKERNEL_TUNER",
         f"-I{src_dir}"
